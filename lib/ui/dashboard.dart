@@ -38,20 +38,8 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-               Image.asset('assets/logo.png', width: 40, height: 40),
-               const SizedBox(width: 16),
-               Text(
-                "Luhut Manager",
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 30),
+          // Removed duplicate header
+          const SizedBox(height: 10),
           _buildServiceCard(
             context, 
             "Nginx Web Server", 

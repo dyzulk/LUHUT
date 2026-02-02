@@ -6,6 +6,7 @@ import 'package:luhut/ui/sites_page.dart';
 import 'package:provider/provider.dart';
 import 'package:luhut/core/process_manager.dart';
 import 'package:luhut/core/hosts_manager.dart';
+import 'package:luhut/core/config_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:system_tray/system_tray.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
       providers: [
         Provider(create: (_) => ProcessManagerService()),
         Provider(create: (_) => HostsManagerService()),
+        ChangeNotifierProvider(create: (_) => ConfigManager()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -139,66 +141,189 @@ class _MainWindowScaffoldState extends State<MainWindowScaffold> with WindowList
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Container(
-        color: const Color(0xAA000000), // Semi-transparent background
-        child: Column(
-          children: [
-            const WindowTitleBar(),
-            Expanded(
-              child: Row(
-                children: [
-                  // --- SIDEBAR ---
-                  Container(
-                    width: 70, // Compact Sidebar width
-                    margin: const EdgeInsets.only(top: 0, bottom: 20, left: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.03),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _SidebarItem(
-                          icon: Icons.dashboard_rounded,
-                          label: "Home",
-                          isSelected: _selectedIndex == 0,
-                          onTap: () => setState(() => _selectedIndex = 0),
-                        ),
-                        const SizedBox(height: 16),
-                        _SidebarItem(
-                          icon: Icons.folder_copy_rounded,
-                          label: "Sites",
-                          isSelected: _selectedIndex == 1,
-                          onTap: () => setState(() => _selectedIndex = 1),
-                        ),
-                        const SizedBox(height: 16),
-                        _SidebarItem(
-                          icon: Icons.settings_rounded,
-                          label: "Config",
-                          isSelected: _selectedIndex == 2,
-                          onTap: () => setState(() => _selectedIndex = 2),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  // --- MAIN CONTENT ---
-                  Expanded(
-                    child: IndexedStack(
-                      index: _selectedIndex,
-                      children: const [
-                        DashboardPage(),
-                        SitesPage(),
-                        SettingsPage(),
-                      ],
-                    ),
-                  ),
-                ],
+      body: Stack(
+        children: [
+          // -- AMBIENT BACKGROUND GLOW --
+          // Top Left Glow (Blue/Purple)
+          Positioned(
+            top: -100,
+            left: -100,
+            child: Container(
+              width: 500,
+              height: 500,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    Colors.blueAccent.withOpacity(0.15),
+                    Colors.purpleAccent.withOpacity(0.05),
+                    Colors.transparent,
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+          // Bottom Right Glow (Cyan/Green)
+          Positioned(
+            bottom: -50,
+            right: -50,
+            child: Container(
+              width: 400,
+              height: 400,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    Colors.cyanAccent.withOpacity(0.1),
+                    Colors.tealAccent.withOpacity(0.05),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          
+          // -- MAIN GLASS SURFACE --
+          Container(
+            color: const Color(0xE6050505), // ~90% Opacity (Much simpler/solid)
+            child: Column(
+              children: [
+                const WindowTitleBar(),
+                Expanded(
+                  child: Row(
+                    children: [
+                      // --- SIDEBAR ---
+                      Container(
+                        width: 240, 
+                        margin: const EdgeInsets.only(top: 0, bottom: 20, left: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.4), // Darker Sidebar
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: Colors.white.withOpacity(0.08)),
+                          boxShadow: [
+                             BoxShadow(
+                               color: Colors.black.withOpacity(0.2),
+                               blurRadius: 20,
+                               offset: const Offset(0, 10),
+                             )
+                          ]
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // -- APP BRANDING --
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [Colors.blueAccent.withOpacity(0.2), Colors.purpleAccent.withOpacity(0.2)],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                  ),
+                                  child: Image.asset('assets/logo.png', width: 24, height: 24),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "Luhut",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                      Text(
+                                        "Local Universal Handling Utility Tool",
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.5),
+                                          fontSize: 8,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                            
+                            const SizedBox(height: 40),
+                            
+                            // -- MENU --
+                            Text(
+                              "MAIN MENU",
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.4),
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            
+                            _SidebarItem(
+                              icon: Icons.dashboard_rounded,
+                              label: "Dashboard",
+                              activeColor: Colors.blueAccent,
+                              isSelected: _selectedIndex == 0,
+                              onTap: () => setState(() => _selectedIndex = 0),
+                            ),
+                            const SizedBox(height: 8),
+                            _SidebarItem(
+                              icon: Icons.folder_copy_rounded,
+                              label: "My Sites",
+                              activeColor: Colors.purpleAccent, // Changed to Purple
+                              isSelected: _selectedIndex == 1,
+                              onTap: () => setState(() => _selectedIndex = 1),
+                            ),
+                            
+                            const Spacer(),
+
+                            // -- BOTTOM --
+                            Divider(color: Colors.white.withOpacity(0.05)),
+                            const SizedBox(height: 16),
+                             _SidebarItem(
+                              icon: Icons.settings_rounded,
+                              label: "Settings",
+                              activeColor: Colors.grey,
+                              isSelected: _selectedIndex == 2,
+                              onTap: () => setState(() => _selectedIndex = 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      // --- MAIN CONTENT ---
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 10, left: 10), 
+                          child: IndexedStack(
+                            index: _selectedIndex,
+                            children: const [
+                              DashboardPage(),
+                              SitesPage(),
+                              SettingsPage(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -209,45 +334,66 @@ class _SidebarItem extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final Color activeColor;
 
   const _SidebarItem({
     required this.icon,
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.activeColor = Colors.blueAccent,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: isSelected
-            ? BoxDecoration(
-                color: Colors.blueAccent.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-              )
-            : null,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? Colors.blueAccent : Colors.white54,
-              size: 26,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        splashColor: activeColor.withOpacity(0.2),
+        highlightColor: activeColor.withOpacity(0.1),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? activeColor.withOpacity(0.15) : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? activeColor.withOpacity(0.3) : Colors.transparent
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.blueAccent : Colors.white38,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? activeColor : Colors.white54,
+                size: 20,
               ),
-            ),
-          ],
+              const SizedBox(width: 12),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.white60,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  fontSize: 14,
+                ),
+              ),
+              const Spacer(),
+              if (isSelected) 
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: activeColor,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(blurRadius: 5, color: activeColor.withOpacity(0.6))
+                    ]
+                  ),
+                )
+            ],
+          ),
         ),
       ),
     );

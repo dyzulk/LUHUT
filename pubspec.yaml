@@ -40,6 +40,8 @@ dependencies:
   window_manager: ^0.5.1
   system_tray: ^2.0.3
   url_launcher: ^6.3.2
+  launch_at_startup: ^0.5.1
+  package_info_plus: ^9.0.0
 
 dev_dependencies:
   flutter_test:
