@@ -1,0 +1,80 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Luhut Specific
+# ----------------
+# User Sites (Don't commit user projects)
+sites/*
+!sites/.gitkeep
+
+# Binaries & Huge Files
+# (Optional: Un-comment if you WANT to commit binaries, but use Git LFS)
+# bin/
+*.pdb
+*.lib
+*.dll
+*.exe
+
+# EXCEPTIONS (We want to commit the binaries for "Portable" distribution)
+# Re-including binaries for now, but ignoring specific large/temp items
+!bin/**
+!bin/**/*.exe
+!bin/**/*.dll
+
+# Binary Specific Ignores (To save space)
+bin/mysql/data/
+bin/mysql/bin/*.pdb
+bin/mysql/lib/*.lib
+bin/nginx/logs/
+bin/nginx/temp/
+bin/nginx/fastcgi_temp/
+bin/nginx/client_body_temp/
+bin/nginx/proxy_temp/
+bin/nginx/scgi_temp/
+bin/nginx/uwsgi_temp/
+
+# Temp Script for Hosts
+luhut_hosts_fix.ps1

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>502 Bad Gateway</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="error-code">502</h1>
+        <h2>Bad Gateway</h2>
+        <p>Nginx cannot communicate with the PHP process.</p>
+
+        <div class="status-badge error">
+            PHP Service Error
+        </div>
+
+        <p style="margin-top: 2rem;">
+            Is <strong>PHP FastCGI</strong> running in Luhut Manager?<br>
+            Please check the dashboard and try restarting the service.
+        </p>
+
+        <div class="footer">
+            Luhut Manager
+        </div>
+    </div>
+</body>
+
+</html>
